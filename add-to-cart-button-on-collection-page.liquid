@@ -1,0 +1,20 @@
+{%- form 'product', product, class: 'ProductForm' -%}
+  <div class="ProductForm__BuyButtons" {{ block.shopify_attributes }}>
+    <button type="submit" data-use-primary-button="true" data-id="{{ product.selected_or_first_available_variant.id }}" class="ProductForm__AddToCart Button {% if product.selected_or_first_available_variant.available %}Button--primary{% else %}Button--secondary{% endif %} Button--full" {% if product.selected_or_first_available_variant.available %}data-action="add-to-cart"{% else %}disabled="disabled"{% endif %}>
+       {%- if product.selected_or_first_available_variant.available -%}
+       <span><svg class="Icon Icon--cart-desktop " role="presentation" viewBox="0 0 19 23"><path d="M0 22.985V5.995L2 6v.03l17-.014v16.968H0zm17-15H2v13h15v-13zm-5-2.882c0-2.04-.493-3.203-2.5-3.203-2 0-2.5 1.164-2.5 3.203v.912H5V4.647C5 1.19 7.274 0 9.5 0 11.517 0 14 1.354 14 4.647v1.368h-2v-.912z" fill="currentColor"></path></svg></span>
+         {%- if block.settings.show_price_in_button -%}
+         <span class="Button__SeparatorDot"></span>
+         <span>{{ product.selected_or_first_available_variant.price | money }}</span>
+         {%- endif -%}
+       {%- else -%}
+         {{- 'product.form.sold_out' | t -}}
+       {%- endif -%}
+    </button>
+  </div>
+  {%- unless has_ouputted_variant_selector -%}
+  {%- comment -%}If for any reason the merchant has removed the variant selector block, we still output the ID here{%- endcomment -%}
+  <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+  {%- endunless -%}
+{%- endform -%}
+
