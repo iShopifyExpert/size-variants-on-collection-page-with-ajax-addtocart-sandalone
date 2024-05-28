@@ -1,0 +1,39 @@
+      {%- unless product.has_only_default_variant -%}
+      <div class="variants-size">
+        {%- for option in product.options_with_values -%}{%- assign downcase_option = option.name | downcase -%}{%- if downcase_option == 'size' -%}
+        <ul class="variants-list">
+          {%- for value in option.values -%}{%- assign value_url = product.variants[forloop.index0].url -%}{%- assign value_id = product.variants[forloop.index0].id -%}
+          <li class="variant-item" data-id="{{ value_id }}">
+            <a href="{{value_url }}">{{ value }}</a>
+          </li>
+          {%- endfor -%}
+        </ul>
+        {%- endif -%}{%- endfor -%}
+      </div>
+      {%- endunless -%}
+      <script>
+      $(document).on('click', '.ProductItem .variants-size .variants-list .variant-item', function(e) {
+        e.preventDefault();
+        var SizevId = $(this).attr("data-id");
+        addItemToCart(SizevId, 1);
+      });
+      function addItemToCart(variant_id, qty) {
+        var data = { "id": variant_id, "quantity": qty };
+        document.dispatchEvent(new CustomEvent('theme:loading:start'));
+        $.ajax({
+          type: 'POST', url: '/cart/add.js', data: data, dataType: 'json',
+          success: function() { 
+            document.documentElement.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+            document.dispatchEvent(new CustomEvent('theme:loading:end'));
+            openCartDrawer();
+          },
+          error: function(e) {
+            document.dispatchEvent(new CustomEvent('theme:loading:end'));
+            alert(e.responseJSON.description);
+          }
+        });
+      }
+      function openCartDrawer() {
+        document.querySelector('.Header__Icon[data-drawer-id="sidebar-cart"]').click();
+      }
+      </script>
