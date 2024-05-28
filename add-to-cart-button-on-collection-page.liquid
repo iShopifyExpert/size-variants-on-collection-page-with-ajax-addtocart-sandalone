@@ -17,4 +17,29 @@
   <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
   {%- endunless -%}
 {%- endform -%}
-
+<script>
+  $(document).on('click', '.ProductItem .ProductForm__BuyButtons', function(e) {
+    e.preventDefault();
+    var SizevId = $(this).find('.ProductForm__AddToCart').attr("data-id");
+    addItemToCart(SizevId, 1);
+  });
+  function addItemToCart(variant_id, qty) {
+    var data = { "id": variant_id, "quantity": qty };
+    document.dispatchEvent(new CustomEvent('theme:loading:start'));
+    $.ajax({
+      type: 'POST', url: '/cart/add.js', data: data, dataType: 'json',
+      success: function() { 
+        document.documentElement.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+        document.dispatchEvent(new CustomEvent('theme:loading:end'));
+        openCartDrawer();
+      },
+      error: function(e) {
+        document.dispatchEvent(new CustomEvent('theme:loading:end'));
+        alert(e.responseJSON.description);
+      }
+    });
+  }
+  function openCartDrawer() {
+    document.querySelector('.Header__Icon[data-drawer-id="sidebar-cart"]').click();
+  }
+  </script>
